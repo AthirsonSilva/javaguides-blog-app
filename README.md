@@ -1,6 +1,6 @@
 # javaguides-blog-app
 
-# A Blog API project that users can add posts, comment on these posts and search them by their category. 
+A Blog API project that users can add posts, comment on these posts and search them by their category. 
 
 ## Technologies used in this project: 
 
