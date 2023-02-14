@@ -3,19 +3,24 @@ package com.blog.app.services.implementation;
 import com.blog.app.entities.Post;
 import com.blog.app.exceptions.ResourceNotFoundException;
 import com.blog.app.payload.PostDto;
+import com.blog.app.payload.PostResponse;
 import com.blog.app.repositories.PostRepository;
 import com.blog.app.services.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class PostServiceImpl implements PostService {
+public class PostServiceImplementation implements PostService {
 
     private final PostRepository postRepository;
 
-    public PostServiceImpl(PostRepository postRepository) {
+    public PostServiceImplementation(PostRepository postRepository) {
         this.postRepository = postRepository;
     }
 
@@ -29,13 +34,29 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
+    public PostResponse getAllPosts(int pageNumber, int pageSize, String sortBy, String sortDirection) {
+        if (pageNumber < 0) {
+            throw new IllegalArgumentException("Page number cannot be less than zero!");
+        }
 
-        return posts
-                .stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        Sort sort = sortDirection.equalsIgnoreCase(
+                Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        Page<Post> posts = postRepository.findAll(pageable);
+
+        List<Post> listOfPosts = posts.getContent();
+
+        return new PostResponse(
+                listOfPosts.stream().map(this::mapToDto).collect(Collectors.toList()),
+                posts.getNumber(),
+                posts.getSize(),
+                posts.getTotalElements(),
+                posts.getTotalPages(),
+                posts.isLast()
+        );
     }
 
     @Override
