@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/posts")
 public class PostController {
@@ -53,9 +55,9 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<Map<String, String>> deletePost(@PathVariable(name = "id") Long id) {
         postService.deletePost(id);
 
-        return new ResponseEntity<>("Post deleted successfully!", HttpStatus.OK);
+        return new ResponseEntity<>(Map.of("message", "Post deleted successfully!"), HttpStatus.OK);
     }
 }
