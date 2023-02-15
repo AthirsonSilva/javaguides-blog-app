@@ -2,6 +2,7 @@ package com.blog.app.controllers;
 
 import com.blog.app.payload.CommentDto;
 import com.blog.app.services.implementation.CommentServiceImplementation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class CommentController {
 
     @PostMapping("/{postId}/comments")
     public ResponseEntity<CommentDto> createComment(
-            @RequestBody CommentDto commentDto,
+            @Valid @RequestBody CommentDto commentDto,
             @PathVariable(value = "postId") long postId
     ) {
         return new ResponseEntity<>(commentService.createComment(postId, commentDto), HttpStatus.CREATED);
