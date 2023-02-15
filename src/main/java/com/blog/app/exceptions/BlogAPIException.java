@@ -3,25 +3,26 @@ package com.blog.app.exceptions;
 import org.springframework.http.HttpStatus;
 
 public class BlogAPIException extends RuntimeException {
-    private final HttpStatus httpStatus;
-    private final String errorMessage;
+    private final HttpStatus status;
+    private final String message;
 
-    public BlogAPIException(HttpStatus httpStatus, String errorMessage) {
-        this.httpStatus = httpStatus;
-        this.errorMessage = errorMessage;
+    public BlogAPIException(HttpStatus status, String message) {
+        this.status = status;
+        this.message = message;
     }
 
-    public BlogAPIException(String message, HttpStatus httpStatus, String errorMessage) {
+    public BlogAPIException(String message, HttpStatus status, String message1) {
         super(message);
-        this.httpStatus = httpStatus;
-        this.errorMessage = errorMessage;
+        this.status = status;
+        this.message = message1;
     }
 
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
+    public HttpStatus getStatus() {
+        return status;
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    @Override
+    public String getMessage() {
+        return message;
     }
 }
