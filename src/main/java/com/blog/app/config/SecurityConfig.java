@@ -13,6 +13,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * security config
+ */
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -29,18 +32,36 @@ public class SecurityConfig {
 		return new BCryptPasswordEncoder();
 	}
 
+	/**
+	 * authentication manager bean
+	 *
+	 * @param configuration configuration
+	 * @return {@link AuthenticationManager}
+	 * @throws Exception java.lang. exception
+	 * @see AuthenticationManager
+	 */
 	@Bean
 	public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration configuration) throws Exception {
 		return configuration.getAuthenticationManager();
 	}
 
+	/**
+	 * security filter chain
+	 *
+	 * @param http http
+	 * @return {@link SecurityFilterChain}
+	 * @throws Exception java.lang. exception
+	 * @see SecurityFilterChain
+	 */
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf().disable()
+		// http basic authentication
+		http
+			.csrf().disable() // disable csrf
 			.authorizeHttpRequests((authorize) ->
-				authorize.requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
-					.requestMatchers("/api/v1/auth/**").permitAll()
-					.anyRequest().authenticated()
+				authorize.requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll() // permit all get requests
+					.requestMatchers("/api/v1/auth/**").permitAll() // permit all auth requests
+					.anyRequest().authenticated() // all other requests must be authenticated
 			);
 
 		return http.build();

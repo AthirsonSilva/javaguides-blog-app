@@ -10,6 +10,7 @@ public class BlogApplication {
 
     @Bean
     public ModelMapper modelMapper() {
+        // Automates the mapping between Java bean types based on a convention over configuration approach.
         return new ModelMapper();
     }
 

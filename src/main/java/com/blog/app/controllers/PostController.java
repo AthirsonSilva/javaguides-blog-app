@@ -23,12 +23,31 @@ public class PostController {
         this.postService = postService;
     }
 
+    /**
+     * create post
+     *
+     * @param postDto postDto
+     * @return {@link ResponseEntity}
+     * @see ResponseEntity
+     * @see PostDto
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto) {
         return new ResponseEntity<>(postService.createPost(postDto), HttpStatus.CREATED);
     }
 
+    /**
+     * get all posts
+     *
+     * @param pageNo pageNo
+     * @param pageSize pageSize
+     * @param sortBy sortBy
+     * @param sortDirection sortDirection
+     * @return {@link ResponseEntity}
+     * @see ResponseEntity
+     * @see PostResponse
+     */
     @GetMapping
     public ResponseEntity<PostResponse> getAllPosts(
             @RequestParam(
@@ -47,17 +66,42 @@ public class PostController {
         return new ResponseEntity<>(postService.getAllPosts(pageNo, pageSize, sortBy, sortDirection), HttpStatus.OK);
     }
 
+    /**
+     * get post by id
+     *
+     * @param id id
+     * @return {@link ResponseEntity}
+     * @see ResponseEntity
+     * @see PostDto
+     */
     @GetMapping("/{id}")
     public ResponseEntity<PostDto> getPostById(@PathVariable(name = "id") Long id) {
         return new ResponseEntity<>(postService.getPostById(id), HttpStatus.OK);
     }
 
+    /**
+     * update post
+     *
+     * @param id id
+     * @param postDto postDto
+     * @return {@link ResponseEntity}
+     * @see ResponseEntity
+     * @see PostDto
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<PostDto> updatePost(@PathVariable(name = "id") Long id, @RequestBody PostDto postDto) {
         return new ResponseEntity<>(postService.updatePost(id, postDto), HttpStatus.OK);
     }
 
+    /**
+     * delete post
+     *
+     * @param id id
+     * @return {@link ResponseEntity}
+     * @see ResponseEntity
+     * @see Map
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deletePost(@PathVariable(name = "id") Long id) {
