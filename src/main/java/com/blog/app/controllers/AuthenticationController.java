@@ -1,8 +1,9 @@
 package com.blog.app.controllers;
 
+import com.blog.app.payload.JwtAuthenticationResponse;
 import com.blog.app.payload.LoginDto;
 import com.blog.app.payload.RegisterDto;
-import com.blog.app.services.AuthService;
+import com.blog.app.services.implementation.AuthenticationServiceImplementation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,13 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+public class AuthenticationController {
 	private final AuthenticationManager authenticationManager;
-	private final AuthService authService;
+	private final AuthenticationServiceImplementation authenticationService;
 
-	public AuthController(AuthenticationManager authenticationManager, AuthService authService) {
+	public AuthenticationController(AuthenticationManager authenticationManager, AuthenticationServiceImplementation authenticationService) {
 		this.authenticationManager = authenticationManager;
-		this.authService = authService;
+		this.authenticationService = authenticationService;
 	}
 
 	/**
@@ -30,8 +31,10 @@ public class AuthController {
 	 * @see String
 	 */
 	@PostMapping(value = {"/login", "/signin"})
-	public ResponseEntity<String> authenticateUser(@RequestBody LoginDto loginDto) {
-		return ResponseEntity.ok(authService.login(loginDto));
+	public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@RequestBody LoginDto loginDto) {
+		String accessToken = authenticationService.login(loginDto);
+
+		return ResponseEntity.ok(new JwtAuthenticationResponse(accessToken));
 	}
 
 	/**
@@ -44,6 +47,6 @@ public class AuthController {
 	 */
 	@PostMapping(value = {"/register", "/signup"})
 	public ResponseEntity<String> registerUser(@RequestBody RegisterDto registerDto) {
-		return ResponseEntity.ok(authService.register(registerDto));
+		return ResponseEntity.ok(authenticationService.register(registerDto));
 	}
 }

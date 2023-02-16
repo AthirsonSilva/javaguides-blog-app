@@ -7,7 +7,8 @@ import com.blog.app.payload.LoginDto;
 import com.blog.app.payload.RegisterDto;
 import com.blog.app.repositories.RoleRepository;
 import com.blog.app.repositories.UserRepository;
-import com.blog.app.services.AuthService;
+import com.blog.app.security.JwtTokenProvider;
+import com.blog.app.services.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,24 +22,26 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-public class AuthServiceImplementation implements AuthService {
+public class AuthenticationServiceImplementation implements AuthenticationService {
 
 	private final AuthenticationManager authenticationManager;
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final JwtTokenProvider jwtTokenProvider;
 
 	@Autowired
-	public AuthServiceImplementation(
+	public AuthenticationServiceImplementation(
 		AuthenticationManager authenticationManager,
 		UserRepository userRepository,
 		RoleRepository roleRepository,
-		PasswordEncoder passwordEncoder
-	) {
+		PasswordEncoder passwordEncoder,
+		JwtTokenProvider jwtTokenProvider) {
 		this.authenticationManager = authenticationManager;
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.jwtTokenProvider = jwtTokenProvider;
 	}
 
 	/**
@@ -60,7 +63,7 @@ public class AuthServiceImplementation implements AuthService {
 		// Set authentication in context
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		return "User logged in successfully";
+		return jwtTokenProvider.generateJwtToken(authentication);
 	}
 
 	/**
