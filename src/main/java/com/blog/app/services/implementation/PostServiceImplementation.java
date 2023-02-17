@@ -1,9 +1,11 @@
 package com.blog.app.services.implementation;
 
+import com.blog.app.entities.Category;
 import com.blog.app.entities.Post;
 import com.blog.app.exceptions.ResourceNotFoundException;
 import com.blog.app.payload.PostDto;
 import com.blog.app.payload.PostResponse;
+import com.blog.app.repositories.CategoryRepository;
 import com.blog.app.repositories.PostRepository;
 import com.blog.app.services.PostService;
 import org.modelmapper.ModelMapper;
@@ -20,90 +22,147 @@ import java.util.stream.Collectors;
 @Service
 public class PostServiceImplementation implements PostService {
 
-    private final PostRepository postRepository;
-    private final ModelMapper modelMapper;
+	private final PostRepository postRepository;
+	private final ModelMapper modelMapper;
+	private final CategoryRepository categoryRepository;
 
-    @Autowired
-    public PostServiceImplementation(PostRepository postRepository, ModelMapper modelMapper) {
-        this.postRepository = postRepository;
-        this.modelMapper = modelMapper;
-    }
+	@Autowired
+	public PostServiceImplementation(PostRepository postRepository, ModelMapper modelMapper, CategoryRepository categoryRepository) {
+		this.postRepository = postRepository;
+		this.modelMapper = modelMapper;
+		this.categoryRepository = categoryRepository;
+	}
 
-    @Override
-    public PostDto createPost(PostDto postDto) {
-        Post post = mapToEntity(postDto);
+	/**
+	 * create post
+	 *
+	 * @param postDto postDto
+	 * @return {@link PostDto}
+	 * @see PostDto
+	 */
+	@Override
+	public PostDto createPost(PostDto postDto) {
+		Category category = categoryRepository.findById(postDto.getCategoryId())
+			.orElseThrow(() -> new ResourceNotFoundException("Category", "id", postDto.getCategoryId()));
 
-        Post newPost = postRepository.save(post);
+		Post post = mapToEntity(postDto);
+		post.setCategory(category);
 
-        return mapToDto(newPost);
-    }
+		return mapToDto(postRepository.save(post));
+	}
 
-    @Override
-    public PostResponse getAllPosts(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        if (pageNumber < 0) {
-            throw new IllegalArgumentException("Page number cannot be less than zero!");
-        }
+	/**
+	 * get all posts
+	 *
+	 * @param pageNumber pageNumber
+	 * @param pageSize pageSize
+	 * @param sortBy sortBy
+	 * @param sortDirection sortDirection
+	 * @return {@link PostResponse}
+	 * @see PostResponse
+	 */
+	@Override
+	public PostResponse getAllPosts(int pageNumber, int pageSize, String sortBy, String sortDirection) {
+		if (pageNumber < 0) {
+			throw new IllegalArgumentException("Page number cannot be less than zero!");
+		}
 
-        Sort sort = sortDirection.equalsIgnoreCase(
-                Sort.Direction.ASC.name())
-                ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+		Sort sort = sortDirection.equalsIgnoreCase(
+			Sort.Direction.ASC.name())
+			? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+		Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
-        Page<Post> posts = postRepository.findAll(pageable);
+		Page<Post> posts = postRepository.findAll(pageable);
 
-        List<Post> listOfPosts = posts.getContent();
+		List<Post> listOfPosts = posts.getContent();
 
-        return new PostResponse(
-                listOfPosts.stream().map(this::mapToDto).collect(Collectors.toList()),
-                posts.getNumber(),
-                posts.getSize(),
-                posts.getTotalElements(),
-                posts.getTotalPages(),
-                posts.isLast()
-        );
-    }
+		return new PostResponse(
+			listOfPosts.stream().map(this::mapToDto).collect(Collectors.toList()),
+			posts.getNumber(),
+			posts.getSize(),
+			posts.getTotalElements(),
+			posts.getTotalPages(),
+			posts.isLast()
+		);
+	}
 
-    @Override
-    public PostDto getPostById(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
+	/**
+	 * get post by id
+	 *
+	 * @param id id
+	 * @return {@link PostDto}
+	 * @see PostDto
+	 */
+	@Override
+	public PostDto getPostById(Long id) {
+		Post post = postRepository.findById(id)
+			.orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
 
-        return mapToDto(post);
-    }
+		return mapToDto(post);
+	}
 
-    @Override
-    public PostDto updatePost(Long id, PostDto postDto) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
+	/**
+	 * update post
+	 *
+	 * @param id id
+	 * @param postDto postDto
+	 * @return {@link PostDto}
+	 * @see PostDto
+	 */
+	@Override
+	public PostDto updatePost(Long id, PostDto postDto) {
+		Post post = postRepository.findById(id)
+			.orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
 
-        if (postDto.getTitle() != null)
-            post.setTitle(postDto.getTitle());
+		Category category = categoryRepository.findById(postDto.getCategoryId())
+			.orElseThrow(() -> new ResourceNotFoundException("Category", "id", postDto.getCategoryId()));
 
-        if (postDto.getDescription() != null)
-            post.setDescription(postDto.getDescription());
+		if (postDto.getTitle() != null)
+			post.setTitle(postDto.getTitle());
 
-        if (postDto.getContent() != null)
-            post.setContent(postDto.getContent());
+		if (postDto.getDescription() != null)
+			post.setDescription(postDto.getDescription());
 
-        Post updatedPost = postRepository.save(post);
+		if (postDto.getContent() != null)
+			post.setContent(postDto.getContent());
 
-        return mapToDto(updatedPost);
-    }
+		if (postDto.getCategoryId() != null)
+			post.setCategory(category);
 
-    @Override
-    public void deletePost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
+		Post updatedPost = postRepository.save(post);
 
-        postRepository.delete(post);
-    }
+		return mapToDto(updatedPost);
+	}
 
-    private PostDto mapToDto(Post post) {
-        return modelMapper.map(post, PostDto.class);
-    }
+	/**
+	 * delete post
+	 *
+	 * @param id id
+	 */
+	@Override
+	public void deletePost(Long id) {
+		Post post = postRepository.findById(id)
+			.orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
 
-    private Post mapToEntity(PostDto postDto) {
-        return modelMapper.map(postDto, Post.class);
-    }
+		postRepository.delete(post);
+	}
+
+	private PostDto mapToDto(Post post) {
+		return modelMapper.map(post, PostDto.class);
+	}
+
+	private Post mapToEntity(PostDto postDto) {
+		return modelMapper.map(postDto, Post.class);
+	}
+
+	@Override
+	public List<PostDto> getPostsByCategoryId(Long categoryId) {
+		Category category = categoryRepository.findById(categoryId)
+			.orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+
+		List<Post> posts = postRepository.findAllByCategoryId(category.getId());
+
+		return posts.stream().map(this::mapToDto).collect(Collectors.toList());
+	}
 }

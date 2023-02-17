@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -108,5 +109,18 @@ public class PostController {
         postService.deletePost(id);
 
         return new ResponseEntity<>(Map.of("message", "Post deleted successfully!"), HttpStatus.OK);
+    }
+
+    /**
+     * get posts by category
+     *
+     * @param id ida
+     * @return {@link ResponseEntity}
+     * @see ResponseEntity
+     * @see List
+     */
+    @GetMapping("/category/{id}")
+    public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable(name = "id") Long id) {
+        return new ResponseEntity<>(postService.getPostsByCategoryId(id), HttpStatus.OK);
     }
 }
