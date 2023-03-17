@@ -2,6 +2,7 @@ package com.blog.app.controllers;
 
 import com.blog.app.payload.CategoryDto;
 import com.blog.app.services.implementation.CategoryServiceImplementation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/categories")
+@Tag(
+		name = "CRUD REST API for Category resource",
+		description = "CRUD REST API for Category resource"
+)
 public class CategoryController {
 	private final CategoryServiceImplementation categoryService;
 

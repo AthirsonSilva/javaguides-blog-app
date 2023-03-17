@@ -4,6 +4,8 @@ import com.blog.app.payload.PostDto;
 import com.blog.app.payload.PostResponse;
 import com.blog.app.services.PostService;
 import com.blog.app.utils.AppConstants;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/posts")
+@Tag(
+        name = "CRUD REST API for Post resource",
+        description = "CRUD REST API for Post resource"
+)
 public class PostController {
     private final PostService postService;
 
@@ -32,6 +38,7 @@ public class PostController {
      * @see ResponseEntity
      * @see PostDto
      */
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto) {
@@ -89,6 +96,7 @@ public class PostController {
      * @see ResponseEntity
      * @see PostDto
      */
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<PostDto> updatePost(@PathVariable(name = "id") Long id, @RequestBody PostDto postDto) {
@@ -103,6 +111,7 @@ public class PostController {
      * @see ResponseEntity
      * @see Map
      */
+    @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deletePost(@PathVariable(name = "id") Long id) {

@@ -1,5 +1,6 @@
 package com.blog.app.payload;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -8,6 +9,7 @@ import lombok.Data;
 import java.util.Set;
 
 @Data
+@Schema(name = "PostDto", description = "A DTO that represents a Post resource with comments and category")
 public class PostDto {
 	private long id;
 	@NotEmpty(message = "Title is required")
