@@ -4,9 +4,9 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    username: ${PGUSER}
-    password: ${PGPASSWORD}
-    url: ${DATABASE_URL}
+    username: postgres
+    password: '@Potter77'
+    url: jdbc:postgresql://localhost:5432/blog
   jpa:
     hibernate:
       ddl-auto: update

@@ -35,12 +35,14 @@ public class BootstrapData {
 
 		User user = new User();
 		user.setUsername("user");
+		user.setName("user");
 		user.setPassword(passwordEncoder.encode("user"));
 		user.setEmail("user@user.com");
 		user.setRoles(Set.of(roleUser));
 
 		User admin = new User();
 		admin.setUsername("admin");
+		admin.setName("admin");
 		admin.setPassword(passwordEncoder.encode("admin"));
 		admin.setEmail("admin@admin.com");
 		admin.setRoles(Set.of(roleUser, roleAdmin));
